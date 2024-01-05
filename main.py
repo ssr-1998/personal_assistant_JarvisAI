@@ -35,15 +35,15 @@ def say(text):
     speaker.Speak(text)
 
 
-def takeCommand():
+def takeCommand(_timeout):
     r = sr.Recognizer()
     with sr.Microphone() as source:
         r.energy_threshold = 500
         r.pause_threshold = 1
-        audio = r.listen(source)
-        say("Recognizing Audio Input...")
         try:
-            query = r.recognize_google(audio, language="en-in")
+            audio = r.listen(source, timeout = _timeout)
+            say("Recognizing Audio Input...")
+            query = r.recognize_google(audio, language = "en-in")
             print(f"User said: {query}")
             return query
         except Exception as e:
@@ -53,6 +53,8 @@ def takeCommand():
             print("{}: {}. Error Occurred at line number ({})".format(error_string, e, line_no))
             if error_string == "Unknown Value Error":
                 say("Sorry, I didn't get that. Can you please repeat!")
+                return None
+            elif error_string == "Wait Timeout Error":
                 return None
             else:
                 error_string = "Mr. {}, I appologise for leaving you in the middle but I am encountering an {} at line number {} which is forcing me to close. I'll take your leave now Sir. Good Day!".format(coder, error_string, line_no)
@@ -66,15 +68,22 @@ if __name__ == "__main__":
         "Mr. {}.\nHow can I help you Sir?".format(coder))
     try:
         bye = "on"
+        audio_input_timeout = 60
         while bye == "on":
             winsound.Beep(4000, 200)
-            print("Listening...")
-            _input = takeCommand()
+            print("Listening... (Audio Input Timeout - {})".format(audio_input_timeout))
+            _input = takeCommand(_timeout = audio_input_timeout)
 
-            if _input == None:
+            if _input == None:  # If no input received, then Jarvis will jump to the next iteration of the While Loop i.e. will again start Listening for any possible command.
                 continue
 
             _input = _input.lower()
+
+            if "set" in _input and "audio input timeout" in _input:  # Code to change Audio Input Timeout Seconds using Jarvis.
+                sec = re.findall("\s(\d+)\s?\w*", _input)
+                if len(sec) > 0:
+                    if sec[0].isnumeric():
+                        audio_input_timeout = int(sec[0])
 
             """
             --- Code for Greetings from Jarvis ---
@@ -82,12 +91,12 @@ if __name__ == "__main__":
             if ("hello" in _input or "hey" in _input or "hi" in _input) and "jarvis" in _input:
                 if "hi" in _input:
                     if "hi" in list(_input.split()):  # Confirming that `Hi` is an individual word or not.
-                        say("Hello, Mr. {}".format(coder))
+                        say("Hello Mr. {}".format(coder))
                 elif "hey" in _input:
                     if "hey" in list(_input.split()):  # Confirming that `Hey` is an individual word or not.
-                        say("Hello, Mr. {}".format(coder))
+                        say("Hello Mr. {}".format(coder))
                 else:
-                    say("Hello, Mr. {}".format(coder))
+                    say("Hello Mr. {}".format(coder))
 
             if "how are you" in _input:
                 say("I'm good. Thank you for asking.\nHow are you today?")
@@ -119,6 +128,7 @@ if __name__ == "__main__":
                     say(f"Opening {site_name} Sir")
                     webbrowser.open_new(sites.get(site_name))
                 elif open_app:
+                    say(f"Opening {app_name} Sir")
                     os.startfile(apps.get(app_name))
                 else:
                     print("Open_Site - {}".format(open_site))
