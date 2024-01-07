@@ -18,7 +18,13 @@ sites = {
     "wikipedia": "https://www.wikipedia.com",
     "google": "https://www.google.com",
     "upgrad": "https://learn.upgrad.com/courses",
-    "upgrade": "https://learn.upgrad.com/courses"
+    "upgrade": "https://learn.upgrad.com/courses",
+    "your development sources": [
+        "https://www.youtube.com/watch?v=s_8b5iq4Rvk&list=WL&index=3&t=2610s",
+        "https://www.youtube.com/watch?v=7RsS2o7DpK0&list=WL&index=2&t=1254s",
+        "https://github.com/BolisettySujith/J.A.R.V.I.S/tree/main"
+        ],
+    "your github repo": "https://github.com/ssr-1998/personal_assistant_JarvisAI/tree/dev"
     }
 apps = {
     "telegram": "D:\S_S_R\Softwares Installed\Telegram Desktop\Telegram.exe",
@@ -125,8 +131,16 @@ if __name__ == "__main__":
                         app_name = i
                         break
                 if open_site:
-                    say(f"Opening {site_name} Sir")
-                    webbrowser.open_new(sites.get(site_name))
+                    if site_name == "your development sources":
+                        say("Opening all my development sources")
+                        for dSources in sites.get(site_name):
+                            webbrowser.open_new(dSources)
+                    else:
+                        if site_name == "your github repo":
+                            say("Opening my Github Repo")
+                        else:
+                            say(f"Opening {site_name} Sir")
+                        webbrowser.open_new(sites.get(site_name))
                 elif open_app:
                     say(f"Opening {app_name} Sir")
                     os.startfile(apps.get(app_name))
