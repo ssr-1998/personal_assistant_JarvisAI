@@ -8,9 +8,11 @@ import re
 import win32com.client
 import warnings
 import datetime
+from openai import OpenAI
 
 coder = "Shubham"
-warnings.filterwarnings("ignore")
+bot_name = "Jarvis"
+warnings.simplefilter("ignore")
 speaker = win32com.client.Dispatch("SAPI.SpVoice")
 sites = {
     "youtube music": "https://music.youtube.com/",
@@ -35,6 +37,38 @@ apps = {
     "control panel": "C:\Windows\System32\control.exe",
     "cmd": "C:\Windows\system32\cmd.exe",
     }
+
+
+def open_ai(_prompt):
+    client = OpenAI()  # It will automatically search for API Key in Environment Variables as "OPENAI_API_KEY"
+    text = f"Prompt : {_prompt}\nResponse : "
+
+    response = client.completions.create(
+    model="gpt-3.5-turbo-instruct",
+    prompt=_prompt,
+    temperature=1,
+    max_tokens=256,
+    top_p=1,
+    frequency_penalty=0,
+    presence_penalty=0
+    )
+    try:
+        print(response["choices"][0]["text"])
+        text += response["choices"][0]["text"]
+    except Exception as e:
+        print(f"Unable to understand! Please check the error.\n{e}")
+        sys.exit()
+
+    if not os.path.exists("OpenAI_Responses"):
+        os.mkdir("OpenAI_Responses")
+        n = 1
+    else:
+        res_no_lst = re.findall("r(\d+).txt", "__".join(os.listdir("OpenAI_Responses")))
+        res_no_lst = [int(i) for i in res_no_lst]
+        n = max(res_no_lst) + 1
+
+    with open("OpenAI_Responses/r{}.txt".format(n), "w") as f:
+        f.write(text)
 
 
 def say(text):
@@ -69,9 +103,9 @@ def takeCommand(_timeout):
 
 
 if __name__ == "__main__":
-    print("Jarvis is Up & Running!")
-    say("Hello, I'm Jarvis, an A.I. powered tool which is still learning & is under development by "
-        "Mr. {}.\nHow can I help you Sir?".format(coder))
+    print("{} is Up & Running!".format(bot_name))
+    say("Hello, I'm {}, an A.I. powered tool which is still learning & is under development by "
+        "Mr. {}.\nHow can I help you Sir?".format(bot_name, coder))
     try:
         bye = "on"
         audio_input_timeout = 60
@@ -80,21 +114,21 @@ if __name__ == "__main__":
             print("Listening... (Audio Input Timeout - {})".format(audio_input_timeout))
             _input = takeCommand(_timeout = audio_input_timeout)
 
-            if _input == None:  # If no input received, then Jarvis will jump to the next iteration of the While Loop i.e. will again start Listening for any possible command.
+            if _input == None:  # If no input received, then bot will jump to the next iteration of the While Loop i.e. will again start Listening for any possible command.
                 continue
 
             _input = _input.lower()
 
-            if "set" in _input and "audio input timeout" in _input:  # Code to change Audio Input Timeout Seconds using Jarvis.
+            if "set" in _input and "audio input timeout" in _input:  # Code to change Audio Input Timeout Seconds using bot.
                 sec = re.findall("\s(\d+)\s?\w*", _input)
                 if len(sec) > 0:
                     if sec[0].isnumeric():
                         audio_input_timeout = int(sec[0])
 
             """
-            --- Code for Greetings from Jarvis ---
+            --- Code for Greetings from Bot ---
             """
-            if ("hello" in _input or "hey" in _input or "hi" in _input) and "jarvis" in _input:
+            if ("hello" in _input or "hey" in _input or "hi" in _input) and bot_name in _input:
                 if "hi" in _input:
                     if "hi" in list(_input.split()):  # Confirming that `Hi` is an individual word or not.
                         say("Hello Mr. {}".format(coder))
@@ -110,12 +144,12 @@ if __name__ == "__main__":
             if "thank you" in _input or "thank u" in _input:
                 say("I'm always happy to help Sir.")
 
-            if "goodbye" in _input or "good bye" in _input or ("goodbye" in _input and "jarvis" in _input):
+            if "goodbye" in _input or "good bye" in _input or ("goodbye" in _input and bot_name in _input):
                 say("Goodbye Mr. {}\nHave a Great Day ahead.".format(coder))
                 bye = "off"
 
             """
-            --- Code for Opening Sites with the help of Jarvis ---
+            --- Code for Opening Sites with the help of Bot ---
             """
             if "open" in _input:
                 open_site = False
@@ -151,6 +185,11 @@ if __name__ == "__main__":
             if ("what" in _input or "what's" in _input) and "time" in _input:
                 nowtime = datetime.datetime.now().strftime("%I : %M %p")
                 say("Sir, it's {}".format(nowtime))
+            
+            if ("use" in _input or "using" in _input) and "ai" in _input:
+                ai_res = open_ai(_input)
+                say(ai_res)
+
     except Exception as e:
         e_traceback = sys.exc_info()[2]
         line_no = str(e_traceback.tb_lineno)
