@@ -12,12 +12,13 @@ This is a Desktop Voice Assistant which can be used to interact with your system
 - It can **Greet Users**.
 - It can **Open Various listed websites**.
 - It can **Open Various listed Applications on your system**.
-- It can tell **Time & Date/Day**.
+- It can tell **Time & Date**.
+- It can use **OpenAI Model** (Set Environment Variable `OPENAI_API_KEY`)
 - It can stop working **by saying `Goodbye` or `Goodbye Jarvis`**.
 
 ## These are the following Python Modules used in JARVIS:
 
-[SpeechRecognisation](https://pypi.org/project/SpeechRecognition/) | [PyAudio](https://pypi.org/project/PyAudio/) | [datetime](https://pypi.org/project/DateTime/) | [wikipedia](https://pypi.org/project/wikipedia/) | [win32com](https://pypi.org/project/pywin32/)
+[SpeechRecognisation](https://pypi.org/project/SpeechRecognition/) | [PyAudio](https://pypi.org/project/PyAudio/) | [datetime](https://pypi.org/project/DateTime/) | [wikipedia](https://pypi.org/project/wikipedia/) | [win32com](https://pypi.org/project/pywin32/) | [openai](https://pypi.org/project/openai/)
 
 ## Future Plans:
 
